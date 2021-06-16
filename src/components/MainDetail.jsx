@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCriptoUpdateUrl } from "../constants";
+import{updatePrice} from '../constants'
 
 // This function give us the current time in seconds
 function currentTime() {
@@ -16,16 +16,43 @@ function convertToSeconds(dateValue) {
     : dateValue;
 }
 
-export default function MainDetail() {
+export default function MainDetail({selectedCripto,crypotoCurrencyList}) {
+ 
+const{symbol,last_updated}= crypotoCurrencyList.find(item=>item.id===selectedCripto)
+
+const[timeDifference, settimeDifference]=useState(currentTime()- convertToSeconds(last_updated)) 
+
+const[countDown,setCountDown]=useState(30)
+const[currentPriceObj,setCurrentPriceObj]=useState('')
+
+function getCurrentPrice(selectedCripto){
+  updatePrice(selectedCripto).then(currentPriceFromServer=>setCurrentPriceObj(currentPriceFromServer[selectedCripto]))
+}
+
+
+useEffect(()=>{
+ let intervalId = setInterval(()=>{settimeDifference(currentTime()- convertToSeconds(last_updated))},1000)
+ setInterval(()=>getCurrentPrice(selectedCripto),1000)
+ return ()=>{clearInterval(intervalId)}
+},[])
+
   return (
     <>
       <section className="main-detail__central">
         <div className="main-detail__update">
-          {/* This part is for the challenge */}
+        <p>next update in {countDown}</p>
+        <button className ="main-detail__button">Pause update</button>
         </div>
-        <div className="main-detail__name"></div>
-        <div className="main-detail__price"></div>
+        <div className="main-detail__name">
+        <h2>{selectedCripto}</h2>
+    <p><span className="small">a.k.a </span>{symbol}</p>
+        </div>
+        <div className="main-detail__price">
+        <p>£{currentPriceObj.gbp}</p>
+    <p>Updated {timeDifference} seconds ago</p>
+        </div>
       </section>
     </>
   );
 }
+

@@ -5,12 +5,16 @@ import MainDetail from "./components/MainDetail";
 import {getCripto} from "./constants"
 
 import SideListItem from "./components/SideListItem"
+import { getNews } from "./constants";
 
+
+import NewsCard from "./components/NewsCard";
 
 function App() {
   // This piece of state keeps the id from the selected coin to be displayed in the MainDetail component
-  const [selectedCripto, setSelectedCripto] = useState(null);
+  const [selectedCripto, setSelectedCripto] = useState(false);
   const[crypotoCurrencyList, setCrypotoCurrencyList] = useState([])
+  const[news,SetNews]=useState([])
 
 //  useEffect(()=>{getCripto().then(crypotoFromServer=> {
 //   setcrypotoCurrencyList([...crypotoCurrencyList,crypotoFromServer ])
@@ -18,11 +22,11 @@ function App() {
 
   useEffect(()=>{
     getCripto().then(crypotoFromServer=>{
-      setCrypotoCurrencyList([...crypotoCurrencyList,...crypotoFromServer ])
+      setCrypotoCurrencyList(crypotoFromServer)
     })
+    getNews().then(newsFromServer=>SetNews(newsFromServer.status_updates))
   },[])
 
-console.log(crypotoCurrencyList)
 
   // This function gives you whether a coin has been selected or not
   // You will need this for the SideListItem component
@@ -36,15 +40,20 @@ console.log(crypotoCurrencyList)
       <aside className="side-list">
       <ul>
       {crypotoCurrencyList.map((item,index)=>{
-        return (<SideListItem item={item} key={index} isSelectedCripto={isSelectedCripto} selectCripto={setSelectedCripto} />)
+        return (<SideListItem item={item} key={index} isSelectedCripto={isSelectedCripto} setSelectedCripto={setSelectedCripto} selectedCripto={selectedCripto} />)
       })}
       </ul>
       </aside>
       <main className="main-detail">
         {selectedCripto
-          ? "Create the main detail component here"
+          ? <MainDetail selectedCripto={selectedCripto} crypotoCurrencyList={crypotoCurrencyList}/>
           : "Select a coin bro!"}
-        {/* News feed component needs to go here */}
+          <ul className='newsfeed'>
+          {news.map((newsItem,index)=>{
+          return <NewsCard newsItem={newsItem} key={index} />
+        })}
+          </ul>
+        
       </main>
     </>
   );
