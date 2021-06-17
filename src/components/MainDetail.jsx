@@ -64,7 +64,6 @@ export default function MainDetail({
     if (countDown === 0) {
       updatePrice(selectedCripto).then((currentPriceFromServer) => {
         let upodatedCurrentPriceObj = currentPriceFromServer[selectedCripto];
-        //no need spread cuz we want to replace completely
         let filteredList = crypotoCurrencyList.map((item) => {
           if (item.id === selectedCripto) {
             item = {
@@ -75,6 +74,7 @@ export default function MainDetail({
           }
           return item;
         });
+        //直接这样写是因为值有时间的差距，如果不写在里面upodatedCurrentPriceObj可能值还没有更新
         setCrypotoCurrencyList(filteredList);
       });
     }
